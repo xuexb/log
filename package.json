@@ -1,0 +1,18 @@
+{
+  "name": "log",
+  "version": "0.0.1",
+  "description": "前端日志lib研究",
+  "main": "src/index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuexb/log.git"
+  },
+  "author": "xiaowu <fe.xiaowu@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xuexb/log/issues"
+  },
+  "homepage": "https://github.com/xuexb/log#readme"
+}
