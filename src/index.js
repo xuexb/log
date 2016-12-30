@@ -6,7 +6,9 @@
 (function (window, $) {
     'use strict';
 
-    var Log = {};
+    var Log = {
+        version: '0.0.1'
+    };
 
     /**
      * 日志构造函数
