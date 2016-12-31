@@ -1,6 +1,7 @@
 /**
  * @file 研究日志
  * @author xiaowu <fe.xiaowu@gmail.com>
+ * @requires jQuery||Zepto
  */
 
 (function (window, $) {
@@ -67,6 +68,7 @@
                 if ($.isFunction(val)) {
                     data[key] = val();
                 }
+
             });
 
             $.extend(target, data);
@@ -79,7 +81,7 @@
          * @param  {string} str 日志参数
          */
         _sendImg: function (str) {
-            var key = Log.expando + (Log.guid ++);
+            var key = Log.expando + (Log.guid++);
             var img = window[key] = new Image();
 
             img.onload = img.onerror = function () {
