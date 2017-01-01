@@ -1,7 +1,6 @@
 /**
  * @file 研究日志
  * @author xiaowu <fe.xiaowu@gmail.com>
- * @requires jQuery||Zepto
  */
 
 (function (window, $) {
@@ -17,14 +16,14 @@
      * @class
      * @param {Object} options 配置参数
      */
-    function Main(options) {
+    Log.Class = function (options) {
         var self = this;
 
         // 合并参数
         self._options = $.extend(true, {}, Log.defaults, options);
-    }
+    };
 
-    $.extend(Main.prototype, {
+    $.extend(Log.Class.prototype, {
 
         /**
          * 发送日志
@@ -139,7 +138,7 @@
      * @return {Object}
      */
     Log.create = function (options) {
-        return new Main(options);
+        return new Log.Class(options);
     };
 
     /**
