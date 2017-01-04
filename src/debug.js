@@ -6,7 +6,121 @@
 (function (window, $, Log) {
     'use strict';
 
-    var debug = {};
+    /**
+     * 验证参数
+     *
+     * @param  {string} value 日志的参数值
+     * @param  {Object} data  规则数据
+     *
+     * @return {boolean}       是否通过
+     */
+    var validateParam = function (value, data) {
+        var type = data.type.toLowerCase();
+        var flag = false;
+
+        // 如果是字符, 则当作字符比较
+        if (type === 'string') {
+            flag = value === data.value + '';
+        }
+
+        // 如果是正则
+        else if (type === 'regexp' ) {
+            flag = new RegExp(data.value.replace('\\', '\\\\')).test(value);
+        }
+
+        else if (type === 'array') {
+            // 因为indexOf不是隐式转换, 而值肯定是string, 这里先把数字转字符
+            if (!$.isArray(data.value)) {
+                data.value = data.value.split(/\s*,\s*/);
+            }
+            // flag = data.value
+        }
+
+        else if (type === 'function') {
+            flag = data.value.call(data, value);
+        }
+
+        return flag;
+    };
+
+    /**
+     * 验证
+     *
+     * @description
+     *     1. 必选 + 无值 => false
+     *     2. 必选 + 有值 => check
+     *     3. 非必选 + 无值 => true
+     *     4. 非必选 + 有值 => check
+     * @param  {Object} target 参数对象
+     *
+     * @return {Object}
+     */
+    var validate = function (target) {
+        var data = debug.param;
+        var pass = {};
+        var error = {};
+        var add = {};
+        var all = {};
+
+
+        // 先根据规则验证一遍
+        $.each(data, function (key, val) {
+            var param = target[key];
+            var isNull = typeof param === 'undefined';
+            var result = $.extend({}, val, {
+                param: isNull ? null : param,
+                valueText: val.value.toString()
+            });
+
+            // 如果必选且没有参数
+            if (val.required && isNull) {
+                result.status = 'error';
+                error[key] = result;
+            }
+
+            // 如果不为必选, 但存在参数 且值为空
+            else if (!val.required && isNull && target.hasOwnProperty(key)) {
+                result.status = 'pass';
+                pass[key] = result;
+            }
+
+            else {
+                if (validateParam(param, val)) {
+                    result.status = 'pass';
+                    pass[key] = result;
+                }
+                else {
+                    result.status = 'error';
+                    error[key] = result;
+                }
+            }
+
+            all[key] = result;
+        });
+
+        // 检查新增参数
+        $.each(target, function (key) {
+            // 如果已经处理过
+            if (all[key]) {
+                return;
+            }
+
+            add[key] = {
+                name: key,
+                param: target[key],
+                status: 'add'
+            };
+        });
+
+        return {
+            add: add,
+            error: error,
+            pass: pass,
+            all: all
+        };
+    };
+
+    var debug = Log.debug || (Log.debug = {});
 
     /**
      * 标识
@@ -36,6 +150,7 @@
     debug.log = function (data, level) {
         if (level === 'error' || !level) {
             console.error(data);
+            // throw new TypeError(data);
         }
         else if (level === 'warning' && debug.type === '2') {
             console.warn(data);
@@ -59,7 +174,7 @@
             var context = this;
             var args = [].slice.call(arguments);
 
-            callback.apply(null, args);
+            callback.apply(context, args);
 
             return old.apply(context, args);
         };
@@ -79,26 +194,72 @@
 
     // Log.create
     debug.mock('Log.create', function (options) {
-        if (!options) {
-            debug.log('Log.create options 不能为空');
+        if ('undefined' === typeof options) {
+            debug.log('Log.create() 不能为空');
         }
         else if (!$.isPlainObject(options)) {
-            debug.log('Log.create options 不为对象');
+            debug.log('Log.create(' + String(options) + ') 不为对象');
         }
         else if (!options.img) {
-            debug.log('Log.create options.img 不能为空');
+            debug.log('Log.create({img}) 不能为空');
         }
         else if (!options.global) {
-            debug.log('Log.create options.global 全局参数为空', 'warning');
+            debug.log('Log.create(options) 全局参数options.global为空', 'warning');
         }
 
     });
 
-    // Class.send
-    debug.mock('Class.send', function (options) {});
+    // 检测全局覆盖时有没有参数重复
+    debug.mock('Class._makeGlobal', function (data) {
+        var options = this._options;
 
-    // 幅值到全局对象上
-    Log.debug = debug;
+        $.each(options.global, function (key) {
+            if (data.hasOwnProperty(key)) {
+                debug.log([
+                    'send里存在全局global里重复参数"' + key + '", ',
+                    '参数值将由"' + data[key] + '"被覆盖为全局的"' + options.global[key] + '"'
+                ].join(''), 'warning');
+            }
+        });
+    });
+
+    // Class.send
+    debug.mock('Class.send', function (key, value) {
+        var data = {};
+
+        if (!key) {
+            debug.log('send() 不能为空');
+        }
+        else if ($.isPlainObject(key)) {
+            if ($.isEmptyObject(key)) {
+                debug.log('send({}) 出现空参数', 'warning');
+            }
+            else {
+                $.extend(data, key);
+            }
+        }
+        else if ('string' === typeof key && 'undefined' === typeof value) {
+            debug.log('send(key) 值不能为空');
+        }
+        else if ('string' !== typeof key) {
+            debug.log('send(' + key + ') key不为string');
+        }
+        else {
+            data[key] = value;
+        }
+    });
+
+    // Class.sendImg
+    debug.mock('Class.sendImg', function (data) {
+        var result;
+
+        if (debug.param) {
+            result = validate(data);
+            // console.log(result)
+        }
+
+        debug.log(window.JSON ? JSON.stringify(data, null, 4) : data, 'warning');
+    });
 
     console.info('日志调试模式: ' + ['', '只报错误', '显示全部信息'][debug.type]);
 })(window, window.$, window.Log);

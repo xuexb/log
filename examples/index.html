@@ -10,13 +10,21 @@
     demo
     <script src="https://github.xuexb.com/static/zepto.js"></script>
     <script src="../src/index.js"></script>
+    <script src="../src/debug.param.js"></script>
     <script src="../src/debug.js"></script>
     <script>
     var page = Log.create({
-
+        img: 'http://github.xuexb.com/static/log.gif',
+        global: {
+            xxoo: Date.now(),
+            xxoo2: null,
+            xxxbb: 0
+        }
+    });
+    page.send({
+        xxofo: 2
     });
 
-    Log.create();
     </script>
 </body>
 </html>

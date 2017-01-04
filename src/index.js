@@ -49,9 +49,21 @@
             self._makeGlobal(data);
 
             // 立即发送日志
-            self._sendImg('?' + $.param(data));
+            self.sendImg(self._filter(data));
 
             return self;
+        },
+
+        _filter: function (data) {
+            var res = {};
+
+            $.each(data, function (key, value) {
+                if (key && typeof value !== 'undefined') {
+                    res[key] = value;
+                }
+            });
+
+            return res;
         },
 
         /**
@@ -77,9 +89,9 @@
          * 发送图片
          *
          * @private
-         * @param  {string} str 日志参数
+         * @param  {Object} data 日志参数
          */
-        _sendImg: function (str) {
+        sendImg: function (data) {
             var key = Log.expando + (Log.guid++);
 
             // 这里一定要挂在window下
@@ -112,7 +124,7 @@
             // 不然如果图片是读缓存的话，会错过事件处理
             // 最后，对于url最好是添加客户端时间来防止缓存
             // 同时服务器也配合一下传递Cache-Control: no-cache;
-            img.src = this._options.img + str;
+            img.src = this._options.img + '?' + $.param(data);
         }
     });
 
