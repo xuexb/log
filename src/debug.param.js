@@ -13,17 +13,18 @@
             required: true,
             text: '测试a',
             type: 'RegExp',
-            value: '[1-9]'
+            value: '^[1-9]$'
         },
         b: {
             text: '测试b',
             type: 'String',
             value: '123'
         },
-        d: {
+        c: {
+            required: true,
             text: '测试d',
             type: 'Array',
-            value: [1, 2, 3]
+            value: '1,2,3,4'
         }
     };
 })(window, window.$, window.Log);

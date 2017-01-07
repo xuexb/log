@@ -18,29 +18,38 @@
         var type = data.type.toLowerCase();
         var flag = false;
 
-        // 如果是字符, 则当作字符比较
-        if (type === 'string') {
-            flag = value === data.value + '';
-        }
-
         // 如果是正则
-        else if (type === 'regexp' ) {
+        if (type === 'regexp' ) {
             flag = new RegExp(data.value.replace('\\', '\\\\')).test(value);
         }
 
+        // 如果是数组则是包含就算
         else if (type === 'array') {
             // 因为indexOf不是隐式转换, 而值肯定是string, 这里先把数字转字符
-            if (!$.isArray(data.value)) {
-                data.value = data.value.split(/\s*,\s*/);
-            }
-            // flag = data.value
+            $.each(data.value.split(/\s*,\s*/), function (index, key) {
+                if (key === value + '') {
+                    flag = true;
+                    return false;
+                }
+            });
         }
 
-        else if (type === 'function') {
-            flag = data.value.call(data, value);
+        // 否则全比较
+        else {
+            flag = value === data.value + '';
         }
 
         return flag;
+    };
+
+    var obj2Arr = function (obj) {
+        var arr = [];
+        $.each(obj, function (key, val) {
+            arr.push($.extend({
+                name: key
+            }, val));
+        });
+        return arr;
     };
 
     /**
@@ -60,28 +69,25 @@
         var pass = {};
         var error = {};
         var add = {};
-        var all = {};
-
 
         // 先根据规则验证一遍
         $.each(data, function (key, val) {
             var param = target[key];
-            var isNull = typeof param === 'undefined';
+            var isNull = !target.hasOwnProperty(key);
             var result = $.extend({}, val, {
-                param: isNull ? null : param,
-                valueText: val.value.toString()
+                param: param
             });
 
             // 如果必选且没有参数
             if (val.required && isNull) {
                 result.status = 'error';
                 error[key] = result;
+                console.log('必须没有参数')
             }
 
-            // 如果不为必选, 但存在参数 且值为空
-            else if (!val.required && isNull && target.hasOwnProperty(key)) {
-                result.status = 'pass';
-                pass[key] = result;
+            // 如果不为必选, 且没有参数则忽略
+            else if (!val.required && isNull) {
+                return;
             }
 
             else {
@@ -95,13 +101,12 @@
                 }
             }
 
-            all[key] = result;
         });
 
         // 检查新增参数
         $.each(target, function (key) {
             // 如果已经处理过
-            if (all[key]) {
+            if (pass[key] || error[key] || add[key]) {
                 return;
             }
 
@@ -112,11 +117,15 @@
             };
         });
 
+        error = obj2Arr(error);
+        add = obj2Arr(add);
+        pass = obj2Arr(pass);
+
         return {
             add: add,
             error: error,
             pass: pass,
-            all: all
+            all: [].concat(error, add, pass)
         };
     };
 
@@ -255,10 +264,10 @@
 
         if (debug.param) {
             result = validate(data);
-            // console.log(result)
+            console.log(JSON.stringify(result, null, 4));
         }
 
-        debug.log(window.JSON ? JSON.stringify(data, null, 4) : data, 'warning');
+        debug.log(window.JSON ? JSON.stringify(data, null, 4) : data, 'warning', $.param(data));
     });
 
     console.info('日志调试模式: ' + ['', '只报错误', '显示全部信息'][debug.type]);
