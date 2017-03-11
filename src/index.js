@@ -36,7 +36,7 @@
         /**
          * 发送日志
          *
-         * @param  {Object|string} key   参数key或者数据对象
+         * @param  {Object|string} key   参数key或者数据对象, 会把全局里同名参数覆盖
          * @param  {string|undefined} value 参数值
          *
          * @return {Object}       this
