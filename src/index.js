@@ -154,6 +154,7 @@
                 delete window[key];
             }
             catch (e) {
+                /* istanbul ignore next */
                 window[key] = null;
             }
 

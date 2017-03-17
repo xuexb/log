@@ -102,7 +102,7 @@
     // 检测空参数
     // 检测超长参数
     debug.mock('Class._makeGlobal', function (data) {
-        var options = this.global || {};
+        var options = this.global;
         var params = {};
 
         // 循环全局参数, 判断send()参数里存在则报警
