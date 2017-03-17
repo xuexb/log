@@ -26,8 +26,9 @@
         this.url = url;
         this.global = options;
 
-        if (Log.debug && Log.debug.global) {
-            $.extend(this.global, Log.debug.global);
+        // 如果有调试url
+        if (Log.debug && Log.debug.url) {
+            this.url = Log.debug.url;
         }
     };
 
