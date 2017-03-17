@@ -76,4 +76,82 @@ describe('src/index.js', function () {
             done();
         }, 100);
     });
+
+    it('Log.guid', function () {
+        var guid = Log.guid;
+
+        expect(guid).to.a('number');
+
+        Log.sendImg({}, '/');
+
+        expect(Log.guid - guid).to.equal(1);
+
+        Log.sendImg({}, '/');
+
+        expect(Log.guid - guid).to.equal(2);
+    });
+
+    it('#send', function () {
+        var spy = sinon.spy(Log, 'sendImg');
+        var log = new Log.create('/1.gif', {
+            a: 1
+        });
+
+        log.send('key', 'value');
+        log.send({
+            b: 2,
+            c: 3
+        });
+
+        expect(spy.args[0][0]).to.be.deep.equal({
+            a: 1,
+            key: 'value'
+        });
+        expect(spy.args[0][1]).to.be.equal('/1.gif');
+
+        expect(spy.args[1][0]).to.be.deep.equal({
+            a: 1,
+            b: 2,
+            c: 3
+        });
+        expect(spy.args[1][1]).to.be.equal('/1.gif');
+
+        spy.restore();
+    });
+
+    it('#_makeGlobal', function () {
+        var log = Log.create('/1.gif', {
+            a: 1,
+            b: 2,
+            c: function () {
+                return 3;
+            }
+        });
+        var data = log._makeGlobal({
+            a: 5,
+            d: 4
+        });
+
+        expect(data).to.be.deep.equal({
+            a: 5,
+            b: 2,
+            c: 3,
+            d: 4
+        });
+    });
+
+    it('debug mode', function () {
+        var old = Log.debug;
+        var spy = sinon.spy(Log, 'sendImg');
+        Log.debug = {
+            url: '/2.gif'
+        };
+        var log = Log.create('/1.gif');
+
+        log.send();
+
+        expect(spy.args[0][1]).to.be.equal('/2.gif');
+
+        Log.debug = old;
+    });
 });
