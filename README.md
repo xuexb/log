@@ -2,6 +2,11 @@
 
 > 前端日志`lib`的研究
 
+[![code style fecs](https://img.shields.io/badge/code%20style-fecs-brightgreen.svg)](https://github.com/ecomfe/fecs)
+[![Build Status](https://travis-ci.org/xuexb/log.svg?branch=master)](https://travis-ci.org/xuexb/log)
+[![Test Coverage](https://img.shields.io/coveralls/xuexb/log/master.svg)](https://coveralls.io/r/xuexb/log)
+[![MIT license](https://img.shields.io/github/license/xuexb/log.svg)](https://github.com/xuexb/log)
+
 ### 特点
 
 - 使用简单
