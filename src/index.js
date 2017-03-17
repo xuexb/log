@@ -104,7 +104,7 @@
      * @return {Object}
      */
     Log.create = function (url, options) {
-        return new Log.Class(url, options);
+        return new Log.Class(url, $.isPlainObject(options) ? options : {});
     };
 
     /**
@@ -134,6 +134,7 @@
     Log.sendImg = function (data, url) {
         var key = Log.expando + (Log.guid++);
 
+        // 以下来参考fex
         // 这里一定要挂在window下
         // 在IE中，如果没挂在window下，这个img变量又正好被GC的话，img的请求会abort
         // 导致服务器收不到日志
@@ -147,6 +148,7 @@
             img.onload = img.onerror = img.onabort = null;
 
             // 清空window变量
+            // https://github.com/jquery/jquery/blob/1.12.4/dist/jquery.js#L8662-L8666
             try {
                 delete window[key];
             }
