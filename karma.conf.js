@@ -15,7 +15,7 @@ module.exports = function(config) {
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         // Important: 下列数组中文件将『逆序载入』
-        frameworks: ['mocha', 'chai'],
+        frameworks: ['mocha', 'chai', 'chai-sinon'],
 
 
         // list of files / patterns to load in the browser
@@ -76,7 +76,7 @@ module.exports = function(config) {
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         // Note: 如果要调试Karma，请设置为DEBUG
-        logLevel: config.LOG_INFO,
+        logLevel: config.LOG_DEBUG,
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
