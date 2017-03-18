@@ -40,6 +40,7 @@
      * 报错
      */
     debug.error = function () {
+        /* istanbul ignore next */
         if (window.console && window.console.error) {
             console.error.apply(console, [].slice.call(arguments));
         }
@@ -49,6 +50,7 @@
      * 警告
      */
     debug.warn = function () {
+        /* istanbul ignore next */
         if (window.console && window.console.warn) {
             console.warn.apply(console, [].slice.call(arguments));
         }
