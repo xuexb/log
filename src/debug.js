@@ -16,7 +16,7 @@
      * @return {string}
      */
     var getLogPath = function (url) {
-        if (String(url)[0] === '/') {
+        if (/^\/[^\/]/.test(url)) {
             url = location.origin + url;
         }
         return url;
