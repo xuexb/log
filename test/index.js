@@ -34,42 +34,42 @@ describe('src/index.js', function () {
         spy.restore();
     });
 
-    it('Log.json2url', function () {
-        expect(Log.json2url()).to.equal('');
-        expect(Log.json2url({
+    it('Log._parseUrl', function () {
+        expect(Log._parseUrl({}, '1.gif')).to.equal('1.gif?');
+        expect(Log._parseUrl({
             a: 1,
             b: 2
-        })).to.equal('a=1&b=2', '参数拼接判断');
-        expect(Log.json2url({
+        }, '1.gif')).to.equal('1.gif?a=1&b=2', '参数拼接判断');
+        expect(Log._parseUrl({
             a: '中',
             测试: 1,
             成功: '对'
-        })).to.equal('a=中&测试=1&成功=对'.replace(/[^&=]+/g, function ($1) {
+        }, '1.gif?xxx=1')).to.equal('1.gif?xxx=1&a=中&测试=1&成功=对'.replace(/[^&=\?]+/g, function ($1) {
             return encodeURIComponent($1);
         }), '中文转义判断');
 
         // 这里后续要配合后端看是否要处理多维数组
-        expect(Log.json2url({
+        expect(Log._parseUrl({
             '': 1,
             '1': '',
             '2': false,
             '3': 0,
             '4': null
-        })).to.equal('2=false&3=0&4=null', '空key过滤判断');
+        }, '1.gif')).to.equal('1.gif?2=false&3=0&4=null', '空key过滤判断');
 
-        expect(Log.json2url({
+        expect(Log._parseUrl({
             false: 1,
             null: 1,
             0: 1,
             '': 1
-        })).to.match(/false=1/, 'key值判断 - false=1')
-        .and.to.match(/0=1/, 'key值判断 - 0=1')
-        .and.to.match(/null=1/, 'key值判断 - null=1');
+        }, '1.gif')).to.have.string('false=1', 'key值判断 - false=1')
+        .and.to.have.string('0=1', 'key值判断 - 0=1')
+        .and.to.have.string('null=1', 'key值判断 - null=1');
     });
 
-    it('Log.sendImg', function (done) {
+    it('Log._sendImg', function (done) {
         var key = Log.expando + Log.guid;
-        Log.sendImg(null, '/1.gif');
+        Log._sendImg({}, '/1.gif');
         expect(window[key]).to.be.instanceof(Image);
         setTimeout(function () {
             expect(window[key]).to.be.undefined;
@@ -82,17 +82,17 @@ describe('src/index.js', function () {
 
         expect(guid).to.a('number');
 
-        Log.sendImg({}, '/');
+        Log._sendImg({}, '/');
 
         expect(Log.guid - guid).to.equal(1);
 
-        Log.sendImg({}, '/');
+        Log._sendImg({}, '/');
 
         expect(Log.guid - guid).to.equal(2);
     });
 
     it('#send', function () {
-        var spy = sinon.spy(Log, 'sendImg');
+        var spy = sinon.spy(Log, '_sendImg');
         var log = new Log.create('/1.gif', {
             a: 1
         });
@@ -142,7 +142,7 @@ describe('src/index.js', function () {
 
     it('debug mode', function () {
         var old = Log.debug;
-        var spy = sinon.spy(Log, 'sendImg');
+        var spy = sinon.spy(Log, '_sendImg');
         Log.debug = {
             url: '/2.gif'
         };

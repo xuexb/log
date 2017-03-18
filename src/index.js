@@ -54,7 +54,7 @@
             }
 
             // 立即发送日志
-            Log.sendImg(self._makeGlobal(data), this.url);
+            Log._sendImg(self._makeGlobal(data), this.url);
 
             return self;
         },
@@ -99,40 +99,48 @@
     /**
      * 创建日志
      *
+     * @description 参数统一判断类型
      * @param {string} url gif图链接
      * @param {Object} options 日志全局参数
      *
      * @return {Object}
      */
     Log.create = function (url, options) {
-        return new Log.Class(url, $.isPlainObject(options) ? options : {});
+        return new Log.Class($.type(url) === 'string' ? url : '', $.isPlainObject(options) ? options : {});
     };
 
     /**
-     * json数据转url
+     * 解析stringify
      *
+     * @private
+     * @description 参数不做判断, 直接使用
      * @param {Object} data 数据对象, 只支持一维json
+     * @param {string} url 链接
      * @return {string}
      */
-    Log.json2url = function (data) {
-        var url = [];
+    Log._parseUrl = function (data, url) {
+        var arr = [];
 
-        $.each(data || {}, function (key, value) {
+        $.each(data, function (key, value) {
             if (key && (!!value || $.inArray(value, [0, false, null]) > -1)) {
-                url.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+                arr.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
             }
         });
 
-        return url.join('&');
+        url += url.indexOf('?') > -1 ? '&' : '?';
+
+        return url + arr.join('&');
     };
 
     /**
      * 发送图片
      *
+     * @private
+     * @description 参数不做判断, 直接使用
      * @param  {Object} data 日志参数
      * @param {string} url 图片地址
      */
-    Log.sendImg = function (data, url) {
+    Log._sendImg = function (data, url) {
         var key = Log.expando + (Log.guid++);
 
         // 以下来参考fex
@@ -168,7 +176,7 @@
         // 不然如果图片是读缓存的话，会错过事件处理
         // 最后，对于url最好是添加客户端时间来防止缓存
         // 同时服务器也配合一下传递Cache-Control: no-cache;
-        img.src = url + '?' + Log.json2url(data);
+        img.src = Log._parseUrl(data, url);
     };
 
     window.Log = Log;

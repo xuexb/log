@@ -140,8 +140,8 @@
     });
 
     // 在发送图片时检测参数
-    debug.mock('Log.sendImg', function (data, url) {
-        var length = (getLogPath(url) + Log.json2url(data)).length;
+    debug.mock('Log._sendImg', function (data, url) {
+        var length = Log._parseUrl(data, getLogPath(url)).length;
 
         if (length > debug.URL_MAX_LENGTH) {
             debug.warn('日志链接超长, 长度为: ' + length);
