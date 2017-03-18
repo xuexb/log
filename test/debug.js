@@ -22,6 +22,32 @@ describe('src/debug.js', function () {
         Log.debug.URL_MAX_LENGTH = URL_MAX_LENGTH; 
     });
 
+    it('debug.mock', function (done) {
+        var key = 'mock_test_' + Date.now();
+
+        Log[key] = function () {};
+        Log.debug.mock('Log.' + key, function (a, b, c) {
+            expect(a).to.be.deep.equal([1]);
+            expect(b).to.be.equal(2);
+            expect(c).to.be.equal(3);
+            expect(this[key]).to.be.a('function');
+            delete Log[key];
+            done();
+        });
+
+        // run
+        Log[key]([1], 2, 3);
+    });
+
+    it('debug.mock error param', function () {
+        var fn = function () {
+            Log.debug.mock('test.xxoo', function () {});
+        };
+
+        expect(fn).to.throw(/name/);
+        expect(fn).to.throw(TypeError);
+    });
+
     it('Log.create 参数检查', function () {
         spy = sinon.spy(Log.debug, 'error');
 
@@ -61,6 +87,25 @@ describe('src/debug.js', function () {
         expect(spy.called).to.be.true;
         expect(spy.calledWithMatch('日志链接超长')).to.be.true;
         spy.restore();
+    });
+
+    it('URL_MAX_LENGTH http url', function () {
+        spy = sinon.spy(Log.debug, 'warn');
+
+        var log = Log.create('//github.xuexb.com/static/log.gif', {
+            time: Date.now()
+        });
+
+        // 防止参数超长报错
+        Log.debug.PARAM_MAX_LENGTH = 100;
+        Log.debug.URL_MAX_LENGTH = 10;
+
+        log.send({
+            xxx: Date.now()
+        });
+
+        expect(spy.called).to.be.true;
+        expect(spy.calledWithMatch('日志链接超长')).to.be.true;
     });
 
     it('PARAM_MAX_LENGTH', function () {

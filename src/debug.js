@@ -82,6 +82,9 @@
             old = Log.Class.prototype[name];
             Log.Class.prototype[name] = fn;
         }
+        else {
+            throw new TypeError('name错误');
+        }
 
     };
 
@@ -137,8 +140,8 @@
     });
 
     // 在发送图片时检测参数
-    debug.mock('Log.sendImg', function (data) {
-        var length = getLogPath(this.url + Log.json2url(data)).length;
+    debug.mock('Log.sendImg', function (data, url) {
+        var length = (getLogPath(url) + Log.json2url(data)).length;
 
         if (length > debug.URL_MAX_LENGTH) {
             debug.warn('日志链接超长, 长度为: ' + length);
