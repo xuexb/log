@@ -132,7 +132,10 @@
         });
 
         $.each(params, function (key, value) {
-            if ('undefined' === typeof value) {
+            if ('undefined' === typeof key || key === '') {
+                debug.warn('存在空参数名');
+            }
+            else if ('undefined' === typeof value) {
                 debug.warn('存在空参数: ' + key);
             }
             else if (String(value).length > debug.PARAM_MAX_LENGTH) {
