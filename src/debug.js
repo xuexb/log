@@ -141,6 +141,12 @@
             else if (String(value).length > debug.PARAM_MAX_LENGTH) {
                 debug.warn('存在超长参数: ' + key + '=' + value + ', 长度为: ' + String(value).length);
             }
+            else if (decodeURIComponent(key) !== key) {
+                debug.warn('存在urlencode后的key: ' + key);
+            }
+            else if (decodeURIComponent(value) !== value) {
+                debug.warn('存在urlencode后的value, key: ' + key);
+            }
         });
     });
 
