@@ -1,18 +1,13 @@
 # log
 
-> 前端日志`lib`的研究
+> 前端日志的研究
 
 [![code style fecs](https://img.shields.io/badge/code%20style-fecs-brightgreen.svg)](https://github.com/ecomfe/fecs)
 [![Build Status](https://travis-ci.org/xuexb/log.svg?branch=master)](https://travis-ci.org/xuexb/log)
 [![Test Coverage](https://img.shields.io/coveralls/xuexb/log/master.svg)](https://coveralls.io/r/xuexb/log)
 [![MIT license](https://img.shields.io/github/license/xuexb/log.svg)](https://github.com/xuexb/log)
 
-### 特点
-
-- 使用简单
-- 空参数过滤
-- 线下地址 - 对线下环境添加`debug.js`, 可以修改为线下地址
-- 统一`urlencode`
+## Topic1: Log lib
 
 ### 思路
 
@@ -23,9 +18,16 @@ var page = Log.create(图片地址);
 page.send('id', 1);
 ```
 
+### 特点
+
+- 使用简单
+- 空参数过滤
+- 线下地址 - 对线下环境添加`debug.js`, 可以修改为线下地址
+- 统一`urlencode`
+
 ### 开发环境
 
-在开发环境下可把`debug.js`加载引用, 可以对空参数、参数超长、链接超长校验. 而参数的值是否符合预期, 没有做校验, 当然如果有对应的参数规范平台也可以在`debug.js`里校验.
+在开发环境下可把`debug.js`引用加载, 可以对空参数、参数超长、链接超长校验. 而参数的值是否符合预期, 没有做校验, 当然如果有对应的参数规范平台也可以在`debug.js`里校验.
 
 方向 | 线上环境 | 开发环境
 --- | --- | ---
@@ -106,3 +108,7 @@ pvLog.send('xxxx', 1);
 #### 4. 采集信息?
 
 目前只是一个简单的`send`库, 没有主动的收集用户信息, 如滚动监听、屏幕信息等, 后续考虑
+
+## Topic2: 用户行为收集
+
+todo
