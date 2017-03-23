@@ -131,20 +131,25 @@
             params[key] = value;
         });
 
+
         $.each(params, function (key, value) {
-            if ('undefined' === typeof key || key === '') {
+            // for in会把undefined的key转成string
+            if ('undefined' === typeof key || key === 'undefined' || key === '') {
                 debug.warn('存在空参数名');
             }
-            else if ('undefined' === typeof value) {
+            else if ('undefined' === typeof value || key === 'undefined' || value === '') {
                 debug.warn('存在空参数: ' + key);
             }
+
             else if (String(value).length > debug.PARAM_MAX_LENGTH) {
                 debug.warn('存在超长参数: ' + key + '=' + value + ', 长度为: ' + String(value).length);
             }
-            else if (decodeURIComponent(key) !== key) {
+
+            // decodeURIComponent之后数字会转字符串
+            else if (decodeURIComponent(key) !== String(key)) {
                 debug.warn('存在urlencode后的key: ' + key);
             }
-            else if (decodeURIComponent(value) !== value) {
+            else if (decodeURIComponent(value) !== String(value)) {
                 debug.warn('存在urlencode后的value, key: ' + key);
             }
         });
