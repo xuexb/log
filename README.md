@@ -53,7 +53,7 @@ Log.create(url, options);
 /**
  * 发送日志
  *
- * @param  {Object|string} key   参数key或者数据对象, 会把全局里同名参数覆盖
+ * @param  {Object|string} key   参数key或者数据对象, 会把全局里同名参数覆盖. 如果不是对象, 只能是string
  * @param  {string|undefined} value 参数值
  *
  * @return {Object}       this
