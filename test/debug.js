@@ -123,9 +123,132 @@ describe('src/debug.js', function () {
         expect(spy.calledWithMatch('存在超长参数')).to.be.true;
     });
 
-    it('参数为空检查', function () {});
+    it('参数为空检查 - undefined', function () {
+        
 
-    it('参数覆盖检查', function () {});
+        var log = Log.create('/1.gif');
+        var xxoo;
 
-    it('urlencode', function () {});
+        [
+            {
+                key: '',
+                assert: '存在空参数名'
+            },
+            {
+                key: '',
+                value: '',
+                assert: '存在空参数名'
+            },
+            {
+                key: xxoo,
+                assert: '存在空参数名'
+            },
+            {
+                key: xxoo,
+                value: '',
+                assert: '存在空参数名'
+            },
+            {
+                key: 'xo',
+                value: '',
+                assert: '存在空参数:'
+            },
+            {
+                key: 'xo',
+                value: xxoo,
+                assert: '存在空参数:'
+            }
+        ].forEach(function (val) {
+            spy = sinon.spy(Log.debug, 'warn');
+            if (val.hasOwnProperty('value')) {
+                log.send(val.key, val.value);
+            }
+            else {
+                log.send(val.key);
+            }
+
+            console.error(spy.args)
+
+            expect(spy.called).to.be.true;
+            expect(spy.calledWithMatch(val.assert)).to.be.true;
+
+            
+
+            spy.restore();
+            spy = null;
+        });
+    });
+
+    it('参数覆盖检查', function () {
+        spy = sinon.spy(Log.debug, 'warn');
+
+        var log = Log.create('/1.gif', {
+            time: 12345
+        });
+
+        log.send({
+            time: 1
+        });
+
+        expect(spy.calledOnce).to.be.true;
+        expect(spy.calledWithMatch('send里存在全局global里重复参数')).to.be.true;
+    });
+
+    it('urlencode - key', function () {
+        spy = sinon.spy(Log.debug, 'warn');
+
+        var data = {};
+        data[encodeURIComponent('测')] = 1;
+        data[encodeURIComponent('试')] = 1;
+        data[encodeURIComponent('1')] = 1;
+        var log = Log.create('/1.gif', data);
+
+        log.send({
+            test: 1
+        });
+
+        spy.args.forEach(function (val) {
+            expect(val[0]).to.be.string('存在urlencode后的key', '验证urlencode过后的key');
+        });
+        expect(spy.calledTwice).to.be.true;
+    });
+
+    it('urlencode - value', function () {
+        spy = sinon.spy(Log.debug, 'warn');
+
+        var log = Log.create('/1.gif');
+
+        log.send({
+            test: encodeURIComponent('测'),
+            test2: encodeURIComponent('试'),
+            test3: encodeURIComponent('1')
+        });
+
+        spy.args.forEach(function (val) {
+            expect(val[0]).to.be.string('存在urlencode后的value', '验证urlencode过后的value');
+        });
+        expect(spy.calledTwice).to.be.true;
+    });
+
+    it('urlencode', function () {
+        spy = sinon.spy(Log.debug, 'warn');
+
+        Log.debug.URL_MAX_LENGTH = 1000;
+
+        var data = {};
+        data[encodeURIComponent('测')] = encodeURIComponent('测');
+        data['ok'] = encodeURIComponent('测');
+        data[encodeURIComponent('试')] = 1;
+        data[encodeURIComponent('1')] = 1;
+        var log = Log.create('/1.gif', data);
+
+        log.send({
+            test: 1
+        });
+
+        spy.args.forEach(function (val) {
+            expect(val[0]).to.be.string('存在urlencode后的', '验证urlencode过后的数据');
+        });
+        expect(spy.calledThrice).to.be.true;
+    });
 });
