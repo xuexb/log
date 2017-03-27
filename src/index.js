@@ -49,7 +49,7 @@
             if ($.isPlainObject(key)) {
                 data = key;
             }
-            else if ('string' === typeof key) {
+            else if ('string' === typeof key && key) {
                 data[key] = value;
             }
 
@@ -159,11 +159,10 @@
             // 清空window变量
             // https://github.com/jquery/jquery/blob/1.12.4/dist/jquery.js#L8662-L8666
             try {
+                window[key] = undefined;
                 delete window[key];
             }
             catch (e) {
-                /* istanbul ignore next */
-                window[key] = null;
             }
 
             // 下面这句非常重要

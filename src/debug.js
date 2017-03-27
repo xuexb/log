@@ -131,13 +131,12 @@
             params[key] = value;
         });
 
-
         $.each(params, function (key, value) {
             // for in会把undefined的key转成string
-            if ('undefined' === typeof key || key === 'undefined' || key === '') {
-                debug.warn('存在空参数名');
+            if ('undefined' === key || key === '') {
+                debug.warn('存在空参数');
             }
-            else if ('undefined' === typeof value || key === 'undefined' || value === '') {
+            else if ('undefined' === typeof value || value === 'undefined' || value === '') {
                 debug.warn('存在空参数: ' + key);
             }
 
