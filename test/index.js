@@ -102,6 +102,8 @@ describe('src/index.js', function () {
             b: 2,
             c: 3
         });
+        log.send();
+        log.send(1, 2);
 
         expect(spy.args[0][0]).to.be.deep.equal({
             a: 1,
@@ -115,6 +117,16 @@ describe('src/index.js', function () {
             c: 3
         });
         expect(spy.args[1][1]).to.be.equal('/1.gif');
+
+        expect(spy.args[2][0]).to.be.deep.equal({
+            a: 1
+        });
+
+        expect(spy.args[3][0]).to.be.deep.equal({
+            a: 1
+        });
+
+        expect(spy.callCount).to.equal(4);
 
         spy.restore();
     });

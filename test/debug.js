@@ -124,58 +124,27 @@ describe('src/debug.js', function () {
     });
 
     it('参数为空检查 - undefined', function () {
-        
+        var log = Log.create('/1.gif', {
+            null: null,
+            false: false,
+            true: true,
+            str: 'str',
+            '': ''
+        });
 
-        var log = Log.create('/1.gif');
-        var xxoo;
+        spy = sinon.spy(Log.debug, 'warn');
 
-        [
-            {
-                key: '',
-                assert: '存在空参数名'
-            },
-            {
-                key: '',
-                value: '',
-                assert: '存在空参数名'
-            },
-            {
-                key: xxoo,
-                assert: '存在空参数名'
-            },
-            {
-                key: xxoo,
-                value: '',
-                assert: '存在空参数名'
-            },
-            {
-                key: 'xo',
-                value: '',
-                assert: '存在空参数:'
-            },
-            {
-                key: 'xo',
-                value: xxoo,
-                assert: '存在空参数:'
-            }
-        ].forEach(function (val) {
-            spy = sinon.spy(Log.debug, 'warn');
-            if (val.hasOwnProperty('value')) {
-                log.send(val.key, val.value);
-            }
-            else {
-                log.send(val.key);
-            }
+        log.send();
+        log.send({
+            a: 1
+        });
+        log.send('ok2', 'undefined');
+        log.send('ok3', '');
 
-            console.error(spy.args)
+        expect(spy.callCount).to.equal(6);
 
-            expect(spy.called).to.be.true;
-            expect(spy.calledWithMatch(val.assert)).to.be.true;
-
-            
-
-            spy.restore();
-            spy = null;
+        spy.args.forEach(function (val) {
+            expect(val[0]).to.be.string('存在空参数', '检查空参数');
         });
     });
 
