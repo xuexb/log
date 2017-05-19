@@ -111,4 +111,53 @@ pvLog.send('xxxx', 1);
 
 ## Topic2: 用户行为收集
 
-todo
+1. 记录用户停留时长
+1. 自动发送, 自动调整发送时机
+2. 可`mark`的动作:
+    1. 按时间点
+    2. 停留时长
+    2. 取值最大
+    3. 取值最小
+1. 默认监听的行为
+    1. scroll
+    2. resize
+    3. focus
+    4. blur
+    5. visibilitychange
+1. 提供`cli`命令解析日志, 并支持绘画出用户在页面内的行为
+2. 提供`alias`接口设置字段别名, 优化日志体积
+
+```js
+const App = Log(options);
+
+// 开始记录首页日志
+App.use('index.html');
+
+// 普通打点, 只记录打点时间
+App.mark('DOM_READY');
+
+// 普通打点, 只记录打点时间
+App.mark('ON_LOAD');
+
+// 记录用户浏览深度 + 浏览轨迹
+let scrollTimer = null;
+$(window).on('scroll.log', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+        App.mark('READ_HEIGHT', window.scrollY);
+        App.mark('MAX_HEIGHT', window.scrollY, Log.markType.MAX);
+    }, 300);
+});
+
+// 以文章id来统计文章的浏览时长
+page.on('文章切换', () => {
+    App.mark('ARTICLE_ID', page.article_id, Log.markType.TIME);
+});
+
+// 统计文章分页切换时间点
+page.on('文章翻页', () => {
+    App.mark('ARTICLE_PAGE', page.current_page);
+});
+
+
+```
